@@ -6,28 +6,31 @@ import TableRow from '@mui/material/TableRow';
 import Checkbox from '@mui/material/Checkbox';
 import MenuItem from '@mui/material/MenuItem';
 import TableCell from '@mui/material/TableCell';
-import { Button } from '@mui/material';
 
 import Iconify from 'src/components/iconify';
+import { Button } from '@mui/material';
 import CommonModal from 'src/components/Modal';
-import AppointmentRecord from './view/appointment-record';
+import AssignPatients from './assign-patients';
+import AppointmentList from './view/appointment-list';
 
 // ----------------------------------------------------------------------
 
 export default function UserTableRow({
   selected,
-  id,
   name,
-  age,
-  gender,
+  specialization,
   contact,
-  diagnosis,
-  allergies,
-  medication,
   handleClick,
+  id,
+  department,
 }) {
   const [open, setOpen] = useState(null);
+  const [modal, setModal] = useState(false);
   const [appointment, setAppointment] = useState(false);
+
+  // const handleOpenMenu = (event) => {
+  //   setOpen(event.currentTarget);
+  // };
 
   const handleCloseMenu = () => {
     setOpen(null);
@@ -39,20 +42,30 @@ export default function UserTableRow({
         <TableCell padding="checkbox">
           <Checkbox disableRipple checked={selected} onChange={handleClick} />
         </TableCell>
-
         <TableCell>{name}</TableCell>
-        <TableCell>{age}</TableCell>
-
-        <TableCell>{gender}</TableCell>
-
+        <TableCell>{specialization}</TableCell>
         <TableCell>{contact}</TableCell>
-        <TableCell>{diagnosis}</TableCell>
-        <TableCell>{medication}</TableCell>
-        <TableCell>{allergies}</TableCell>
+        <TableCell>{department}</TableCell>
         <TableCell>
-          <Button onClick={() => setAppointment(true)}>Appointment Record</Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              setModal(true);
+            }}
+          >
+            Assign Patients
+          </Button>
         </TableCell>
-
+        <TableCell>
+          <Button
+            onClick={() => {
+              setAppointment(true);
+            }}
+          >
+            Appointments
+          </Button>
+        </TableCell>
         {/* <TableCell>
           <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
         </TableCell> */}
@@ -85,23 +98,25 @@ export default function UserTableRow({
         </MenuItem>
       </Popover>
       <CommonModal
+        open={modal}
+        handleClose={() => setModal(false)}
+        content={<AssignPatients handleClose={() => setModal(false)} id={id} />}
+      />
+      <CommonModal
         open={appointment}
         handleClose={() => setAppointment(false)}
-        content={<AppointmentRecord handleClose={() => setAppointment(false)} id={id} />}
+        content={<AppointmentList handleClose={() => setAppointment(false)} id={id} />}
       />
     </>
   );
 }
 
 UserTableRow.propTypes = {
-  gender: PropTypes.any,
-  age: PropTypes.any,
+  specialization: PropTypes.any,
   handleClick: PropTypes.func,
   contact: PropTypes.any,
   name: PropTypes.any,
   selected: PropTypes.any,
-  diagnosis: PropTypes.any,
-  allergies: PropTypes.any,
-  medication: PropTypes.any,
   id: PropTypes.string,
+  department: PropTypes.string,
 };

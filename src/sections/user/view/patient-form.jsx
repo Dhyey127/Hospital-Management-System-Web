@@ -1,13 +1,29 @@
-import { Button, TextField } from '@mui/material';
+import {
+  Button,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { Controller, useForm } from 'react-hook-form';
+import instance from 'src/api/api';
+import PropTypes from 'prop-types';
 
-export default function PatientForm() {
+export default function PatientForm({ handleClose, getData }) {
   // Initialize the hook
   const { control, handleSubmit } = useForm();
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const onSubmit = async (data) => {
+    try {
+      await instance.post('/patient/add', data);
+      handleClose();
+      getData();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -17,7 +33,7 @@ export default function PatientForm() {
       </Typography>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Controller
-          name="Name"
+          name="name"
           control={control}
           defaultValue=""
           rules={{ required: 'Name is required' }}
@@ -35,7 +51,7 @@ export default function PatientForm() {
           )}
         />
         <Controller
-          name="Age"
+          name="age"
           control={control}
           defaultValue=""
           rules={{ required: 'Age is required' }}
@@ -54,7 +70,30 @@ export default function PatientForm() {
           )}
         />
         <Controller
-          name="ContactNo"
+          name="gender"
+          control={control}
+          defaultValue=""
+          rules={{ required: 'Gender is required' }}
+          render={({ field, fieldState }) => (
+            <FormControl
+              fullWidth
+              margin="dense"
+              size="small"
+              variant="outlined"
+              error={!!fieldState.error}
+            >
+              <InputLabel>Gender</InputLabel>
+              <Select {...field} label="Gender">
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
+              </Select>
+              <FormHelperText>{fieldState.error ? fieldState.error.message : null}</FormHelperText>
+            </FormControl>
+          )}
+        />
+        <Controller
+          name="contact"
           control={control}
           defaultValue=""
           rules={{ required: 'ContactNo is required' }}
@@ -72,7 +111,7 @@ export default function PatientForm() {
           )}
         />
         <Controller
-          name="previous"
+          name="diagnosis"
           control={control}
           defaultValue=""
           // rules={{ required: 'Previous is required' }}
@@ -111,7 +150,7 @@ export default function PatientForm() {
           )}
         />
         <Controller
-          name="medications"
+          name="medication"
           control={control}
           defaultValue=""
           render={({ field, fieldState }) => (
@@ -136,3 +175,8 @@ export default function PatientForm() {
     </>
   );
 }
+
+PatientForm.propTypes = {
+  handleClose: PropTypes.any,
+  getData: PropTypes.any,
+};

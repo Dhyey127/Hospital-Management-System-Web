@@ -1,8 +1,10 @@
 // import { faker } from '@faker-js/faker';
+import { useEffect, useState } from 'react';
 
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
+import instance from 'src/api/api';
 
 // import Iconify from 'src/components/iconify';
 
@@ -19,6 +21,18 @@ import AppWidgetSummary from '../app-widget-summary';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
+  const [counts, setcounts] = useState({});
+
+  const getDashboardCounts = async () => {
+    const data = await instance.get('/counts');
+    console.log('🚀 ~ getDashboardCounts ~ data:', data);
+    setcounts(data.result);
+  };
+
+  useEffect(() => {
+    getDashboardCounts();
+  }, []);
+
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
@@ -29,16 +43,16 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Patients"
-            total={714000}
+            total={counts?.patient}
             color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Doctors"
-            total={1352831}
+            total={counts?.doctor}
             color="info"
             icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />
@@ -47,9 +61,9 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Departments"
-            total={1723315}
+            total={counts?.department}
             color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
+            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
           />
         </Grid>
 

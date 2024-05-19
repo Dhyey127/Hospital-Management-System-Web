@@ -20,12 +20,12 @@ const navConfig = [
   {
     title: 'doctor',
     path: '/doctor',
-    icon: icon('ic_cart'),
+    icon: icon('ic_user'),
   },
   {
     title: 'departments',
     path: '/departments',
-    icon: icon('ic_blog'),
+    icon: icon('ic_user'),
   },
   // {
   //   title: 'login',

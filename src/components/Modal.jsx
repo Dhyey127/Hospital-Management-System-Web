@@ -16,6 +16,7 @@ const style = {
 };
 
 export default function CommonModal({ open, handleClose, content }) {
+  console.log('here');
   return (
     <Modal
       open={open}

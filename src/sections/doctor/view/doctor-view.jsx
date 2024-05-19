@@ -18,7 +18,7 @@ import TableNoData from '../table-no-data';
 import UserTableHead from '../user-table-head';
 import UserTableRow from '../user-table-row';
 import UserTableToolbar from '../user-table-toolbar';
-import PatientForm from './patient-form';
+import DoctorForm from './doctor-form';
 import { applyFilter, emptyRows, getComparator } from '../utils';
 
 // ----------------------------------------------------------------------
@@ -36,11 +36,22 @@ export default function UserPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [modal, setModal] = useState(false);
-  const [patientData, setPatientData] = useState([]);
+  const [doctorData, setDoctorData] = useState([]);
 
-  const getData = async (rowPerPage) => {
-    const data = await instance.post(`/patient/list`, { limit: rowPerPage });
-    setPatientData(data.result);
+  const getData = async (rowPerPage, filter) => {
+    const data = await instance.post(`/doctor/list`, { limit: rowPerPage, filter });
+    setDoctorData(data.result);
+    if (!filter) {
+      localStorage.setItem(
+        'specialization',
+        JSON.stringify(
+          data.result.map((doctor) => ({
+            name: doctor.specialization,
+            checked: false,
+          }))
+        )
+      );
+    }
   };
 
   useEffect(() => {
@@ -97,9 +108,9 @@ export default function UserPage() {
   };
 
   const dataFiltered =
-    patientData.length > 0
+    doctorData.length > 0
       ? applyFilter({
-          inputData: patientData,
+          inputData: doctorData,
           comparator: getComparator(order, orderBy),
           filterName,
         })
@@ -110,7 +121,7 @@ export default function UserPage() {
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Patients</Typography>
+        <Typography variant="h4">Doctors</Typography>
 
         <Button
           variant="contained"
@@ -118,7 +129,7 @@ export default function UserPage() {
           startIcon={<Iconify icon="eva:plus-fill" />}
           onClick={() => setModal(true)}
         >
-          New Patients
+          New Doctor
         </Button>
       </Stack>
 
@@ -127,6 +138,8 @@ export default function UserPage() {
           numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleFilterByName}
+          doctorData={doctorData}
+          getData={(filter) => getData(rowsPerPage, filter)}
         />
 
         <Scrollbar>
@@ -141,13 +154,11 @@ export default function UserPage() {
                 // onSelectAllClick={handleSelectAllClick}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'age', label: 'Age' },
-                  { id: 'gender', label: 'Gender' },
+                  { id: 'specialization', label: 'Specialization' },
                   { id: 'contact', label: 'Contact' },
-                  { id: 'diagnosis', label: 'Diagnosis' },
-                  { id: 'allergies', label: 'Allergies' },
-                  { id: 'medication', label: 'Medication' },
-                  { id: 'appointment', label: 'Appointment Record' },
+                  { id: 'department', label: 'Department' },
+                  { id: 'assign', label: 'Assign Patient' },
+                  { id: 'appointments', label: 'Appointments' },
                 ]}
               />
               <TableBody>
@@ -155,15 +166,12 @@ export default function UserPage() {
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
                     <UserTableRow
-                      id={row._id}
-                      key={row.id}
                       name={row.name}
-                      age={row.age}
-                      gender={row.gender}
+                      key={row.id}
+                      id={row._id}
+                      specialization={row.specialization}
                       contact={row.contact}
-                      diagnosis={row.diagnosis}
-                      allergies={row.allergies}
-                      medication={row.medication}
+                      department={row.department?.name || 'N/A'}
                       selected={selected.indexOf(row.name) !== -1}
                       handleClick={(event) => handleClick(event, row.name)}
                     />
@@ -194,7 +202,7 @@ export default function UserPage() {
         open={modal}
         handleClose={() => setModal(false)}
         content={
-          <PatientForm handleClose={() => setModal(false)} getData={() => getData(rowsPerPage)} />
+          <DoctorForm handleClose={() => setModal(false)} getData={() => getData(rowsPerPage)} />
         }
       />
     </Container>
